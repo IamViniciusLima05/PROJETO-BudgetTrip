@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BudgetTrip | Planejador de viagens</title>
+  <meta name="description" content="Organize destinos, datas e hospedagem e veja o custo total estimado da sua viagem.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topo">
+    <button class="marca" id="ir-inicio">Budget<b>Trip</b> <span aria-hidden="true">✈</span></button>
+    <button class="btn" id="nova-viagem">+ Nova viagem</button>
+  </header>
+
+  <!-- Lista de viagens -->
+  <main class="app" id="tela-lista">
+    <h1 class="titulo-lista">Suas viagens</h1>
+    <ul class="viagens" id="viagens"></ul>
+  </main>
+
+  <!-- Viagem aberta -->
+  <main class="app" id="tela-viagem" hidden>
+    <button class="voltar" id="voltar">‹ Todas as viagens</button>
+    <section class="capa" id="capa"></section>
+
+    <div class="layout">
+      <div class="col">
+        <section class="bloco">
+          <div class="bloco__topo"><h2>🗺️ Roteiro</h2><button class="link" id="add-destino">+ Destino</button></div>
+          <ol class="roteiro" id="roteiro"></ol>
+        </section>
+
+        <section class="bloco">
+          <div class="bloco__topo"><h2>💸 Gastos</h2><button class="btn pequeno" id="add-gasto">+ Adicionar gasto</button></div>
+          <div class="cats-filtro" id="cats-filtro" role="group" aria-label="Filtrar por categoria"></div>
+          <ul class="gastos" id="gastos"></ul>
+        </section>
+
+        <section class="bloco">
+          <h2>🍽️ Alimentação</h2>
+          <div class="comida">
+            <label>Gasto por pessoa por dia
+              <span class="moeda"><span>R$</span><input id="comida-dia" inputmode="decimal" placeholder="0,00"></span>
+            </label>
+            <p id="comida-total"></p>
+          </div>
+          <div class="sugestoes" id="sug-comida" aria-label="Sugestões"></div>
+        </section>
+      </div>
+
+      <aside class="resumo" id="resumo" aria-live="polite"></aside>
+    </div>
+  </main>
+
+  <dialog id="dlg-viagem" aria-labelledby="dv-titulo">
+    <form method="dialog" id="form-viagem">
+      <h2 id="dv-titulo">Nova viagem</h2>
+      <label>Nome da viagem<input id="v-nome" required maxlength="50" placeholder="Ex.: Férias em Gramado"></label>
+      <div class="linha">
+        <label>Ida<input id="v-inicio" type="date" required></label>
+        <label>Volta<input id="v-fim" type="date" required></label>
+      </div>
+      <div class="linha">
+        <label>Viajantes<input id="v-pessoas" type="number" min="1" max="50" value="2" required></label>
+        <label>Orçamento (R$)<input id="v-orcamento" inputmode="decimal" placeholder="Opcional"></label>
+      </div>
+      <fieldset><legend>Clima da viagem</legend><div class="temas" id="v-temas"></div></fieldset>
+      <p class="erro" id="v-erro" role="alert"></p>
+      <div class="acoes">
+        <button type="button" class="link perigo" id="v-excluir" hidden>Excluir viagem</button>
+        <button value="cancelar" formnovalidate class="btn sec">Cancelar</button>
+        <button value="salvar" class="btn">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-destino" aria-labelledby="dd-titulo">
+    <form method="dialog" id="form-destino">
+      <h2 id="dd-titulo">Destino</h2>
+      <label>Cidade<input id="d-cidade" required maxlength="50" placeholder="Ex.: Gramado, RS"></label>
+      <div class="linha">
+        <label>Chegada<input id="d-chegada" type="date" required></label>
+        <label>Saída<input id="d-saida" type="date" required></label>
+      </div>
+      <label>Anotações<input id="d-nota" maxlength="80" placeholder="Ex.: Ficar perto do centro"></label>
+      <p class="erro" id="d-erro" role="alert"></p>
+      <div class="acoes">
+        <button type="button" class="link perigo" id="d-excluir" hidden>Remover</button>
+        <button value="cancelar" formnovalidate class="btn sec">Cancelar</button>
+        <button value="salvar" class="btn">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-gasto" aria-labelledby="dg-titulo">
+    <form method="dialog" id="form-gasto">
+      <h2 id="dg-titulo">Novo gasto</h2>
+      <fieldset><legend>Categoria</legend><div class="cats" id="g-cats"></div></fieldset>
+      <label>Descrição<input id="g-desc" required maxlength="60"></label>
+      <div class="linha" id="g-linha-noites">
+        <label>Noites<input id="g-noites" type="number" min="1" max="365" value="1"></label>
+        <label>Valor por noite (R$)<input id="g-por-noite" inputmode="decimal" placeholder="0,00"></label>
+      </div>
+      <div class="linha" id="g-linha-valor">
+        <label>Valor (R$)<input id="g-valor" inputmode="decimal" placeholder="0,00"></label>
+        <label class="check"><input type="checkbox" id="g-por-pessoa"> Valor por pessoa</label>
+      </div>
+      <label class="check"><input type="checkbox" id="g-pago"> Já está pago</label>
+      <p class="calculo" id="g-calculo"></p>
+      <p class="erro" id="g-erro" role="alert"></p>
+      <div class="acoes">
+        <button type="button" class="link perigo" id="g-excluir" hidden>Excluir</button>
+        <button value="cancelar" formnovalidate class="btn sec">Cancelar</button>
+        <button value="salvar" class="btn">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+  <div class="toast" id="toast" role="status" hidden></div>
+  <script src="js/script.js"></script>
+</body>
+</html>
